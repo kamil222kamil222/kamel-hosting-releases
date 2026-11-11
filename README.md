@@ -11,7 +11,7 @@ Panel hostingowy dla Ubuntu: WWW, WordPress, PHP, MariaDB, Redis, DNS, SSL, pocz
 Na czystym **Ubuntu Server 24.04 LTS AMD64** zaloguj się jako **root** (lub `sudo -i`) i wklej:
 
 ```bash
-curl -fsSLO https://raw.githubusercontent.com/kamil222kamil222/kamel-hosting-releases/main/kamel-install.sh && echo 'a6c5fa4391215754069fa7bbddadb77973c6315e61c0a47cc19863f711ac86ea  kamel-install.sh' | sha256sum -c - && bash kamel-install.sh
+curl -fsSLO https://raw.githubusercontent.com/kamil222kamil222/kamel-hosting-releases/main/kamel-install.sh && echo '3734ef4bb730a81f22de59b4049087361b574031b0913f508ed1935b46a6985d  kamel-install.sh' | sha256sum -c - && bash kamel-install.sh
 ```
 
 Ta jedna linia: pobiera oficjalny launcher → sprawdza **przypięty SHA256** → uruchamia go dopiero po zgodności.  
