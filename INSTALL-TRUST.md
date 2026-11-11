@@ -1,46 +1,37 @@
-# Kamel Hosting — weryfikacja instalacji (dokumentacja techniczna)
+# Weryfikacja instalacji Kamel Hosting (dokumentacja techniczna)
 
-Ten dokument opisuje łańcuch zaufania. **Krótka instrukcja dla użytkownika** jest w [README](README.md) (3 linie).
-
-## Trust anchor w instrukcji publicznej
-
-W README jest **przypięty SHA256** konkretnego pliku `bootstrap-github-WERSJA.sh` z wydania STABLE.
-
-```text
-curl … bootstrap-github-WERSJA.sh
-echo 'PRZYPINANY_SHA256  bootstrap-github-WERSJA.sh' | sha256sum -c -
-sudo bash bootstrap-github-WERSJA.sh --stable
-```
-
-- Linia 1: pobranie wersjonowanego bootstrapa z GitHub Releases (nie z gałęzi `main`).
-- Linia 2: porównanie z sumą **wpisaną w dokumentacji** — to kotwica zaufania wobec CDN/GitHub.
-- Linia 3: uruchomienie **tylko** po udanej weryfikacji SHA256. To **nie** jest `curl | bash`.
-
-## Co robi bootstrap po uruchomieniu
-
-1. Preflight: Ubuntu 24.04 LTS AMD64, RAM, dysk, sieć.
-2. Pobranie `channel-manifest.json` (+ `.sha256`, `.sig`) z najnowszego non-prerelease STABLE.
-3. Weryfikacja SHA256 + **Ed25519** przypiętym kluczem w bootstrapie  
-   `387c48338b9b473a4d01da37a1e78d74080b3fd2a9b64edfe6ab7d29885f7277`.
-4. Pobranie pakietu `kamel-hosting-install-*.tar.gz` wg manifestu.
-5. Ponowna weryfikacja SHA256 + Ed25519.
-6. Rozpakowanie i kreator instalacji PL.
-
-## Aktualizacja instrukcji przy nowym STABLE
-
-Artefakty Release są **immutable**. Przy publikacji `vX.Y.Z`:
-
-1. Policz SHA256 nowego `bootstrap-github-X.Y.Z.sh`.
-2. Zaktualizuj **3 linie** w publicznym README (URL + hash + nazwa pliku).
-3. Zaktualizuj Release Notes (link do README).
-4. Nie podmieniaj plików starszych wydań.
-
-Szablon utrzymywany w prywatnym repo: `docs/releases-repo-README.md`, skrypt bootstrapa: `packaging/bootstrap-github.sh` (publikowany jako podpisany artefakt).
-
-## Offline
+## Jedna komenda użytkownika
 
 ```bash
-sudo bash bootstrap-github-WERSJA.sh --offline /ścieżka/do/kamel-hosting-install-WERSJA.tar.gz
+curl -fsSLO https://raw.githubusercontent.com/kamil222kamil222/kamel-hosting-releases/main/kamel-install.sh && echo '<SHA256>  kamel-install.sh' | sha256sum -c - && sudo bash kamel-install.sh
 ```
 
-Pakiet i sidecary muszą pochodzić z tego samego wydania.
+To **nie** jest `curl | bash`. Kolejność jest wymuszona przez `&&`:
+
+1. Pobranie `kamel-install.sh`
+2. Porównanie z **przypiętym SHA256** (trust anchor w instrukcji)
+3. Uruchomienie **tylko** przy zgodności
+
+## Co robi launcher po weryfikacji SHA256
+
+1. Preflight narzędzi (curl, python3, …)
+2. Wyszukanie najnowszego non-prerelease STABLE w GitHub Releases
+3. Pobranie `bootstrap-github-*.sh` + `.sha256` + `.sig`
+4. Weryfikacja SHA256 + **Ed25519** kluczem przypiętym w launcherze  
+   `387c48338b9b473a4d01da37a1e78d74080b3fd2a9b64edfe6ab7d29885f7277`
+5. Bootstrap weryfikuje `channel-manifest.json` i pakiet install (ponownie SHA256 + Ed25519)
+6. Kreator / instalacja stosu
+
+Sidecar `kamel-install.sh.sig` jest publikowany dodatkowo; kotwicą w komendzie użytkownika jest SHA256 (czytelne, krótkie).
+
+## Aktualizacja komendy
+
+Launcher zmienia się rzadko. Gdy zmieni się `kamel-install.sh`:
+
+1. `python3 packaging/gen-one-command.py`
+2. Opublikuj `kamel-install.sh`, `.sha256`, `.sig` oraz README z nową sumą
+3. Pakiety STABLE mogą iść naprzód bez zmiany komendy, dopóki launcher jest ten sam
+
+## Odrzucanie podmiany
+
+Zmiana bajtu w pobranym `kamel-install.sh` → `sha256sum -c` kończy się błędem → instalacja nie startuje.
