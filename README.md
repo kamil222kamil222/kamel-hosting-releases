@@ -1,24 +1,24 @@
 # Kamel Hosting
 
-Panel hostingowy dla Ubuntu: witryny WWW, WordPress, PHP, bazy, poczta, DNS, SSL, kopie zapasowe i aktualizacje — w jednym miejscu, po polsku.
+Panel hostingowy dla Ubuntu: WWW, WordPress, PHP, MariaDB, Redis, DNS, SSL, poczta, kopie zapasowe i aktualizacje.
 
-**STABLE:** [0.17.11](https://github.com/kamil222kamil222/kamel-hosting-releases/releases/tag/v0.17.11) · [Wszystkie wydania](https://github.com/kamil222kamil222/kamel-hosting-releases/releases)
+**STABLE:** [0.17.11](https://github.com/kamil222kamil222/kamel-hosting-releases/releases/tag/v0.17.11) · [Wydania](https://github.com/kamil222kamil222/kamel-hosting-releases/releases)
 
 ---
 
-## Instalacja
+## Instalacja Kamel Hosting — jedna komenda
 
-Na czystym **Ubuntu Server 24.04 LTS AMD64** (jako root / `sudo`):
+Na czystym **Ubuntu Server 24.04 LTS AMD64** zaloguj się jako **root** (lub `sudo -i`) i wklej:
 
 ```bash
-curl -fsSLO https://github.com/kamil222kamil222/kamel-hosting-releases/releases/download/v0.17.11/bootstrap-github-0.17.11.sh
-echo '19a7474f63a18089c739f9c04d51ab07419b7969361682b454bc6579b2113dfc  bootstrap-github-0.17.11.sh' | sha256sum -c -
-sudo bash bootstrap-github-0.17.11.sh --stable
+curl -fsSLO https://raw.githubusercontent.com/kamil222kamil222/kamel-hosting-releases/main/kamel-install.sh && echo 'a6c5fa4391215754069fa7bbddadb77973c6315e61c0a47cc19863f711ac86ea  kamel-install.sh' | sha256sum -c - && bash kamel-install.sh
 ```
 
-Jeśli `sha256sum -c` zgłosi błąd — **nie uruchamiaj** skryptu (plik został zmieniony lub pobranie jest niekompletne).
+Ta jedna linia: pobiera oficjalny launcher → sprawdza **przypięty SHA256** → uruchamia go dopiero po zgodności.  
+Launcher wykrywa najnowszy **STABLE**, weryfikuje **SHA256 + Ed25519**, instaluje stos i uruchamia kreator (domena / e-mail).  
+Jeśli `sha256sum` zgłosi błąd — **nie kontynuuj**.
 
-Po weryfikacji bootstrap pobierze najnowszy zatwierdzony pakiet **STABLE**, sprawdzi podpisy i uruchomi kreator instalacji.
+Szczegóły zaufania: [INSTALL-TRUST.md](INSTALL-TRUST.md)
 
 ---
 
@@ -28,45 +28,41 @@ Po weryfikacji bootstrap pobierze najnowszy zatwierdzony pakiet **STABLE**, spra
 |--|--|
 | System | Ubuntu Server **24.04 LTS**, **AMD64** |
 | RAM | min. **2 GB** (zalecane 4 GB+) |
-| Dysk | min. **4 GB** wolnego na `/` (zalecane 20 GB+) |
-| Uprawnienia | **root** / `sudo` |
-| Sieć | Internet (APT + GitHub Releases) |
-| Porty | **80**, **443** (oraz poczta wg potrzeb) |
-| DNS | rekord A/AAAA domen wskazujący VPS |
+| Dysk | min. **4 GB** wolnego (zalecane 20 GB+) |
+| Uprawnienia | **sudo** / root |
+| Sieć | Internet |
+| Porty | **80**, **443** (+ poczta wg potrzeb) |
 | Środowisko | zalecany **czysty** VPS |
 
 ---
 
 ## Pierwsze logowanie
 
-1. Po instalacji otwórz adres panelu podany przez kreator (domena lub tunel SSH do portu 80).
-2. Ustaw hasło administratora (strona setup / link z instalacji).
-3. Włącz **2FA** w ustawieniach konta.
-4. Dodaj pierwszą domenę w **WWW**, zainstaluj WordPress w razie potrzeby, wystaw **SSL**.
+1. Po instalacji otwórz adres z raportu końcowego (domena lub tunel SSH do portu 80).
+2. Ustaw hasło administratora.
+3. Włącz **2FA**.
+4. Dodaj domenę w **WWW**, WordPress, **SSL**.
 5. Sprawdź **Kopie zapasowe** i **Aktualizacje**.
 
 ---
 
 ## Funkcje
 
-WWW · WordPress · PHP 8.3 · MariaDB · Redis · DNS · SSL (Let’s Encrypt) · poczta + Roundcube · kopie zapasowe · użytkownicy · bezpieczeństwo (w tym 2FA) · aktualizacje panelu
+WWW · WordPress · PHP 8.3 · MariaDB · Redis · DNS · SSL · poczta + Roundcube · kopie zapasowe · użytkownicy · 2FA · aktualizacje panelu
 
 ---
 
 ## Automatyczne aktualizacje
 
-Na nowych instalacjach (od **0.17.10**) automatyczne aktualizacje **Kamel Hosting STABLE** są **włączone domyślnie**: tylko podpisane wydania, backup przed aktualizacją, kontrola usług, możliwość wyłączenia w panelu. Aktualizacje Ubuntu (APT) są osobnym mechanizmem.
+Od **0.17.10** na nowych instalacjach: `auto_apply=true`, tylko podpisane STABLE, backup przed aktualizacją, kontrola usług, rollback, dzwonek z changelogiem, możliwość wyłączenia w panelu. Bez automatycznego rebootu całego VPS. Aktualizacje Ubuntu (APT) są osobne.
 
 ---
 
-## Pobieranie i dokumentacja
+## Pobieranie
 
 | | |
 |--|--|
-| Wydania STABLE | [Releases](https://github.com/kamil222kamil222/kamel-hosting-releases/releases) |
-| Instalator tej wersji | [bootstrap-github-0.17.11.sh](https://github.com/kamil222kamil222/kamel-hosting-releases/releases/download/v0.17.11/bootstrap-github-0.17.11.sh) |
-| Weryfikacja kryptograficzna | [INSTALL-TRUST.md](INSTALL-TRUST.md) |
-| Problemy | [Issues](https://github.com/kamil222kamil222/kamel-hosting-releases/issues) |
-
-Offline: pobierz bootstrap + `kamel-hosting-install-*.tar.gz` (+ `.sha256` / `.sig`), potem  
-`sudo bash bootstrap-github-0.17.11.sh --offline /ścieżka/do/pakietu.tar.gz`
+| Launcher | [kamel-install.sh](kamel-install.sh) · [SHA256](kamel-install.sh.sha256) · [sig](kamel-install.sh.sig) |
+| Pakiety STABLE | [Releases](https://github.com/kamil222kamil222/kamel-hosting-releases/releases) |
+| Weryfikacja | [INSTALL-TRUST.md](INSTALL-TRUST.md) |
+| Issues | [Issues](https://github.com/kamil222kamil222/kamel-hosting-releases/issues) |
